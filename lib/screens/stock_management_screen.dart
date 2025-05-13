@@ -234,6 +234,46 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  void _deleteStock(Stock stock) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Stock'),
+          content: const Text('Are you sure you want to delete this stock?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final parseObject = ParseObject('stock')..objectId = stock.id;
+                parseObject.delete().then((response) {
+                  if (response.success) {
+                    setState(() {
+                      _stocks.remove(stock);
+                    });
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${response.error?.message}')),
+                    );
+                  }
+                }).catchError((error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $error')),
+                  );
+                });
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _signOut() async {
     final currentUser = await ParseUser.currentUser() as ParseUser?;
     if (currentUser != null) {
@@ -285,6 +325,10 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () => _editStock(stock),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => _deleteStock(stock),
                     ),
                   ],
                 ),
