@@ -133,6 +133,107 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  void _editStock(Stock stock) {
+    final _formKey = GlobalKey<FormState>();
+    String name = stock.name;
+    DateTime buyDate = stock.buyDate;
+    double price = stock.price;
+    int quantity = stock.quantity;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Stock'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  initialValue: name,
+                  decoration: const InputDecoration(labelText: 'Stock Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a stock name';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => name = value!,
+                ),
+                TextFormField(
+                  initialValue: price.toString(),
+                  decoration: const InputDecoration(labelText: 'Price'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || double.tryParse(value) == null) {
+                      return 'Please enter a valid price';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => price = double.parse(value!),
+                ),
+                TextFormField(
+                  initialValue: quantity.toString(),
+                  decoration: const InputDecoration(labelText: 'Quantity'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || int.tryParse(value) == null) {
+                      return 'Please enter a valid quantity';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => quantity = int.parse(value!),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  stock
+                    ..name = name
+                    ..buyDate = buyDate
+                    ..price = price
+                    ..quantity = quantity;
+
+                  final parseObject = ParseObject('stock')
+                    ..objectId = stock.id
+                    ..set('name', name)
+                    ..set('buyDate', buyDate)
+                    ..set('price', price)
+                    ..set('quantity', quantity);
+
+                  parseObject.save().then((response) {
+                    if (response.success) {
+                      setState(() {});
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${response.error?.message}')),
+                      );
+                    }
+                  }).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $error')),
+                    );
+                  });
+                }
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _signOut() async {
     final currentUser = await ParseUser.currentUser() as ParseUser?;
     if (currentUser != null) {
@@ -177,7 +278,17 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
           ],
           rows: _stocks.map((stock) {
             return DataRow(cells: [
-              DataCell(Text(stock.name)),
+              DataCell(
+                Row(
+                  children: [
+                    Text(stock.name),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _editStock(stock),
+                    ),
+                  ],
+                ),
+              ),
               DataCell(Text(stock.buyDate.toString())),
               DataCell(Text(stock.price.toString())),
               DataCell(Text(stock.quantity.toString())),
