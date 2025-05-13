@@ -337,12 +337,73 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     }
   }
 
+  void _queryStocksByName(String name) async {
+    try {
+      final results = await Stock.queryByName(name);
+      setState(() {
+        _stocks.clear();
+        _stocks.addAll(results);
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error querying stocks: $error')),
+      );
+    }
+  }
+
+  void _showQueryDialog() {
+    final _formKey = GlobalKey<FormState>();
+    String queryName = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Query Stocks by Name'),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              decoration: const InputDecoration(labelText: 'Stock Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a stock name';
+                }
+                return null;
+              },
+              onSaved: (value) => queryName = value!,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  Navigator.pop(context);
+                  _queryStocksByName(queryName);
+                }
+              },
+              child: const Text('Query'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stock Management'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: _showQueryDialog,
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _signOut,
