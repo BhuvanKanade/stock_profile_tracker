@@ -67,9 +67,30 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a stock name';
                     }
+                    if (!RegExp(r'^[a-zA-Z]+(\s[a-zA-Z]+)*$').hasMatch(value)) {
+                      return 'Stock name can only contain letters';
+                    }
                     return null;
                   },
                   onSaved: (value) => name = value!,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Buy Date'),
+                  readOnly: true,
+                  controller: TextEditingController(text: buyDate.toLocal().toString().split(' ')[0]),
+                  onTap: () async {
+                    final selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: buyDate,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (selectedDate != null) {
+                      setState(() {
+                        buyDate = selectedDate;
+                      });
+                    }
+                  },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Price'),
@@ -157,9 +178,30 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a stock name';
                     }
+                    if (!RegExp(r'^[a-zA-Z]+(\s[a-zA-Z]+)*$').hasMatch(value)) {
+                      return 'Stock name can only contain letters';
+                    }
                     return null;
                   },
                   onSaved: (value) => name = value!,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Buy Date'),
+                  readOnly: true,
+                  controller: TextEditingController(text: buyDate.toLocal().toString().split(' ')[0]),
+                  onTap: () async {
+                    final selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: buyDate,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (selectedDate != null) {
+                      setState(() {
+                        buyDate = selectedDate;
+                      });
+                    }
+                  },
                 ),
                 TextFormField(
                   initialValue: price.toString(),
@@ -333,7 +375,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   ],
                 ),
               ),
-              DataCell(Text(stock.buyDate.toString())),
+              DataCell(Text(stock.buyDate.toLocal().toString().split(' ')[0])),
               DataCell(Text(stock.price.toString())),
               DataCell(Text(stock.quantity.toString())),
             ]);
