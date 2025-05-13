@@ -49,4 +49,25 @@ class Stock {
       throw Exception('Failed to save stock: ${response.error?.message}');
     }
   }
+
+  static Future<List<Stock>> queryByName(String name) async {
+    final query = QueryBuilder(ParseObject('stock'))
+      ..whereContains('name', name);
+
+    final response = await query.query();
+
+    if (response.success && response.results != null) {
+      return response.results!.map((result) {
+        return Stock(
+          id: result.objectId!,
+          name: result.get<String>('name') ?? '',
+          buyDate: result.get<DateTime>('buyDate') ?? DateTime.now(),
+          price: (result.get<num>('price') ?? 0.0).toDouble(),
+          quantity: result.get<int>('quantity') ?? 0,
+        );
+      }).toList();
+    } else {
+      throw Exception('Failed to query stocks: ${response.error?.message}');
+    }
+  }
 }
