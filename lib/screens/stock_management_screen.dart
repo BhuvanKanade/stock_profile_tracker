@@ -13,6 +13,37 @@ class StockManagementScreen extends StatefulWidget {
 class _StockManagementScreenState extends State<StockManagementScreen> {
   final List<Stock> _stocks = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchStocks();
+  }
+
+  void _fetchStocks() async {
+    final query = QueryBuilder(ParseObject('stock'));
+    final response = await query.query();
+
+    if (response.success && response.results != null) {
+      setState(() {
+        _stocks.clear();
+        for (var result in response.results!) {
+          final stock = Stock(
+            id: result.objectId!,
+            name: result.get<String>('name') ?? '',
+            buyDate: result.get<DateTime>('buyDate') ?? DateTime.now(),
+            price: (result.get<num>('price') ?? 0.0).toDouble(),
+            quantity: result.get<int>('quantity') ?? 0,
+          );
+          _stocks.add(stock);
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching stocks: ${response.error?.message}')),
+      );
+    }
+  }
+
   void _addStock() {
     final _formKey = GlobalKey<FormState>();
     String name = '';
@@ -135,15 +166,24 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: _stocks.length,
-        itemBuilder: (context, index) {
-          final stock = _stocks[index];
-          return ListTile(
-            title: Text(stock.name),
-            subtitle: Text('Quantity: ${stock.quantity}, Price: ${stock.price}'),
-          );
-        },
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: const [
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Buy Date')),
+            DataColumn(label: Text('Price')),
+            DataColumn(label: Text('Quantity')),
+          ],
+          rows: _stocks.map((stock) {
+            return DataRow(cells: [
+              DataCell(Text(stock.name)),
+              DataCell(Text(stock.buyDate.toString())),
+              DataCell(Text(stock.price.toString())),
+              DataCell(Text(stock.quantity.toString())),
+            ]);
+          }).toList(),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addStock,
