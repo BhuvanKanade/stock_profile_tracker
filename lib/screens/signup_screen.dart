@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
-import 'signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
-  Future<void> _login() async {
+  Future<void> _signup() async {
     setState(() {
       _isLoading = true;
     });
 
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+    final email = _emailController.text.trim();
 
-    final user = ParseUser(username, password, null);
-    final response = await user.login();
+    final user = ParseUser(username, password, email);
+    final response = await user.signUp();
 
     setState(() {
       _isLoading = false;
@@ -31,9 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
+        const SnackBar(content: Text('Signup successful! Please log in.')),
       );
-      // Navigate to the next screen
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${response.error?.message}')),
@@ -45,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Sign Up'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -58,6 +59,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 16.0),
             TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
               controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
@@ -66,19 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
-                    onPressed: _login,
-                    child: const Text('Login'),
+                    onPressed: _signup,
+                    child: const Text('Sign Up'),
                   ),
-            const SizedBox(height: 16.0),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignupScreen()),
-                );
-              },
-              child: const Text('Don\'t have an account? Sign up'),
-            ),
           ],
         ),
       ),
