@@ -405,6 +405,10 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             onPressed: _showQueryDialog,
           ),
           IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchStocks,
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _signOut,
           ),
