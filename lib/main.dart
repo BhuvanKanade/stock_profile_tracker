@@ -1,7 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Back4App
+  const String appId = 'fXQ05eSrraerb3Ijw6tgBo8T4D2FIAF66mbkE3DQ';
+  const String clientKey = 'JE6ONRwdtNMvl3l4UF45hfYSZC6gCaLs0gR8ta11';
+  const String parseServerUrl = 'https://parseapi.back4app.com';
+
+  await Parse().initialize(appId, parseServerUrl, clientKey: clientKey, autoSendSessionId: true);
+
+  // Test connection to Back4App
+  await testBack4AppConnection();
+
   runApp(const MyApp());
+}
+
+Future<void> testBack4AppConnection() async {
+  final ParseResponse response = await ParseObject('TestObject').getAll();
+
+  if (response.success) {
+    print('Connection to Back4App is successful!');
+  } else {
+    print('Failed to connect to Back4App: ${response.error?.message}');
+  }
 }
 
 class MyApp extends StatelessWidget {
