@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
+import 'login_screen.dart';
 import '../models/stock.dart';
 
 class StockManagementScreen extends StatefulWidget {
@@ -100,11 +102,38 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  void _signOut() async {
+    final currentUser = await ParseUser.currentUser() as ParseUser?;
+    if (currentUser != null) {
+      final response = await currentUser.logout();
+      if (response.success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.error?.message}')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No user is currently logged in.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stock Management'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _signOut,
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: _stocks.length,
