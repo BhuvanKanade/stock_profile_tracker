@@ -23,6 +23,16 @@ class _SignupScreenState extends State<SignupScreen> {
     final password = _passwordController.text.trim();
     final email = _emailController.text.trim();
 
+    if (email.isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email cannot be blank.')),
+      );
+      return;
+    }
+
     final user = ParseUser(username, password, email);
     final response = await user.signUp();
 
