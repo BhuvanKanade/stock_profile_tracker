@@ -46,6 +46,48 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _resetPassword() {
+    final TextEditingController emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Reset Password'),
+          content: TextField(
+            controller: emailController,
+            decoration: const InputDecoration(labelText: 'Enter your email'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = emailController.text.trim();
+                if (email.isNotEmpty) {
+                  final response = await ParseUser(null, null, email).requestPasswordReset();
+                  if (response.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Password reset email sent!')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${response.error?.message}')),
+                    );
+                  }
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Reset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +125,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
               },
               child: const Text('Don\'t have an account? Sign up'),
+            ),
+            const SizedBox(height: 16.0),
+            TextButton(
+              onPressed: _resetPassword,
+              child: const Text('Forgot Password? Reset here'),
             ),
           ],
         ),
