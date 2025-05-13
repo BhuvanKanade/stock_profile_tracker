@@ -1,3 +1,5 @@
+import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
+
 class Stock {
   String id;
   String name;
@@ -33,5 +35,18 @@ class Stock {
       price: map['price'],
       quantity: map['quantity'],
     );
+  }
+
+  Future<void> saveToBack4App() async {
+    final parseObject = ParseObject('stock') // Updated class name to lowercase
+      ..set('name', name)
+      ..set('buyDate', buyDate)
+      ..set('price', price)
+      ..set('quantity', quantity);
+
+    final response = await parseObject.save();
+    if (!response.success) {
+      throw Exception('Failed to save stock: ${response.error?.message}');
+    }
   }
 }
