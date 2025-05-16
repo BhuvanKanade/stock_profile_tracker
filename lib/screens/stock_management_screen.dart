@@ -3,6 +3,7 @@ import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 import 'login_screen.dart';
 import '../models/stock.dart';
 
+// Main screen for managing stocks
 class StockManagementScreen extends StatefulWidget {
   const StockManagementScreen({Key? key}) : super(key: key);
 
@@ -11,14 +12,16 @@ class StockManagementScreen extends StatefulWidget {
 }
 
 class _StockManagementScreenState extends State<StockManagementScreen> {
+  // List to hold all stocks
   final List<Stock> _stocks = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchStocks();
+    _fetchStocks(); // Fetch stocks when screen initializes
   }
 
+  // Fetch all stocks from Back4App
   void _fetchStocks() async {
     final query = QueryBuilder(ParseObject('stock'));
     final response = await query.query();
@@ -38,12 +41,14 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
         }
       });
     } else {
+      // Show error if fetch fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching stocks: ${response.error?.message}')),
       );
     }
   }
 
+  // Show dialog to add a new stock
   void _addStock() {
     final _formKey = GlobalKey<FormState>();
     String name = '';
@@ -61,6 +66,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Stock name input
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Stock Name'),
                   validator: (value) {
@@ -74,6 +80,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   },
                   onSaved: (value) => name = value!,
                 ),
+                // Buy date input (date picker)
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Buy Date'),
                   readOnly: true,
@@ -92,6 +99,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     }
                   },
                 ),
+                // Price input
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Price'),
                   keyboardType: TextInputType.number,
@@ -103,6 +111,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   },
                   onSaved: (value) => price = double.parse(value!),
                 ),
+                // Quantity input
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Quantity'),
                   keyboardType: TextInputType.number,
@@ -118,10 +127,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             ),
           ),
           actions: [
+            // Cancel button
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
+            // Add button
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
@@ -134,6 +145,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     quantity: quantity,
                   );
 
+                  // Save new stock to Back4App
                   newStock.saveToBack4App().then((_) {
                     setState(() {
                       _stocks.add(newStock);
@@ -154,6 +166,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  // Show dialog to edit an existing stock
   void _editStock(Stock stock) {
     final _formKey = GlobalKey<FormState>();
     String name = stock.name;
@@ -171,6 +184,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Stock name input
                 TextFormField(
                   initialValue: name,
                   decoration: const InputDecoration(labelText: 'Stock Name'),
@@ -185,6 +199,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   },
                   onSaved: (value) => name = value!,
                 ),
+                // Buy date input (date picker)
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Buy Date'),
                   readOnly: true,
@@ -203,6 +218,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     }
                   },
                 ),
+                // Price input
                 TextFormField(
                   initialValue: price.toString(),
                   decoration: const InputDecoration(labelText: 'Price'),
@@ -215,6 +231,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   },
                   onSaved: (value) => price = double.parse(value!),
                 ),
+                // Quantity input
                 TextFormField(
                   initialValue: quantity.toString(),
                   decoration: const InputDecoration(labelText: 'Quantity'),
@@ -231,10 +248,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             ),
           ),
           actions: [
+            // Cancel button
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
+            // Update button
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
@@ -252,6 +271,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     ..set('price', price)
                     ..set('quantity', quantity);
 
+                  // Save updated stock to Back4App
                   parseObject.save().then((response) {
                     if (response.success) {
                       setState(() {});
@@ -276,6 +296,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  // Show dialog to confirm and delete a stock
   void _deleteStock(Stock stock) {
     showDialog(
       context: context,
@@ -284,10 +305,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
           title: const Text('Delete Stock'),
           content: const Text('Are you sure you want to delete this stock?'),
           actions: [
+            // Cancel button
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
+            // Delete button
             ElevatedButton(
               onPressed: () {
                 final parseObject = ParseObject('stock')..objectId = stock.id;
@@ -316,6 +339,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  // Sign out the current user
   void _signOut() async {
     final currentUser = await ParseUser.currentUser() as ParseUser?;
     if (currentUser != null) {
@@ -337,6 +361,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     }
   }
 
+  // Query stocks by name using Back4App
   void _queryStocksByName(String name) async {
     try {
       final results = await Stock.queryByName(name);
@@ -351,6 +376,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     }
   }
 
+  // Show dialog to enter stock name for querying
   void _showQueryDialog() {
     final _formKey = GlobalKey<FormState>();
     String queryName = '';
@@ -374,10 +400,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             ),
           ),
           actions: [
+            // Cancel button
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
+            // Query button
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
@@ -396,10 +424,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for stock management
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stock Management'),
         actions: [
+          // Search, refresh, and logout buttons
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: _showQueryDialog,
@@ -423,6 +453,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
             DataColumn(label: Text('Price')),
             DataColumn(label: Text('Quantity')),
           ],
+          // Display each stock as a row in the table
           rows: _stocks.map((stock) {
             return DataRow(cells: [
               DataCell(
@@ -447,6 +478,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
           }).toList(),
         ),
       ),
+      // Floating button to add a new stock
       floatingActionButton: FloatingActionButton(
         onPressed: _addStock,
         child: const Icon(Icons.add),
