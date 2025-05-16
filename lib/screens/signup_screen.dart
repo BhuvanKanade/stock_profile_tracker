@@ -1,3 +1,7 @@
+// Author: Bhuvan Kanade
+// Description: Signup screen for Stock Profile Tracker app.
+// Handles user registration with validation.
+
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
@@ -14,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
+  // Handles user signup with email validation
   Future<void> _signup() async {
     setState(() {
       _isLoading = true;
