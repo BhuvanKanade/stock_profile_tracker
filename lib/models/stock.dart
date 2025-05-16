@@ -1,3 +1,7 @@
+// Author: Bhuvan Kanade
+// Description: Stock model for Stock Profile Tracker app.
+// This file defines the Stock class and its methods for CRUD operations with Back4App.
+
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
 class Stock {
@@ -7,6 +11,7 @@ class Stock {
   double price;
   int quantity;
 
+  // Constructor for Stock object
   Stock({
     required this.id,
     required this.name,
@@ -15,7 +20,7 @@ class Stock {
     required this.quantity,
   });
 
-  // Convert a Stock object to a Map
+  // Convert a Stock object to a Map (for local use)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -37,8 +42,9 @@ class Stock {
     );
   }
 
+  // Save this stock to Back4App
   Future<void> saveToBack4App() async {
-    final parseObject = ParseObject('stock') // Updated class name to lowercase
+    final parseObject = ParseObject('stock')
       ..set('name', name)
       ..set('buyDate', buyDate)
       ..set('price', price)
@@ -50,6 +56,7 @@ class Stock {
     }
   }
 
+  // Query stocks by name from Back4App
   static Future<List<Stock>> queryByName(String name) async {
     final query = QueryBuilder(ParseObject('stock'))
       ..whereContains('name', name);
