@@ -17,6 +17,9 @@ A cross-platform Flutter app for managing your stock portfolio with user authent
 - **Responsive UI:**  
   - Works on Android, iOS, and desktop (with Flutter support).
 
+## [Youtube Video](https://www.youtube.com/watch?v=bWpbOSK6JYE)
+## [CPAD 2023mt13031 Stock Management App.pptx](https://github.com/BhuvanKanade/stock_profile_tracker/blob/main/CPAD%202023mt13031%20Stock%20Management%20App.pptx)
+
 ## Getting Started
 
 ### Prerequisites
