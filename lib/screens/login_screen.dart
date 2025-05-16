@@ -1,3 +1,7 @@
+// Author: Bhuvan Kanade
+// Description: Login screen for Stock Profile Tracker app.
+// Handles user login, navigation to signup, and password reset.
+
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 import 'signup_screen.dart';
@@ -15,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  // Handles user login
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -46,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Handles password reset
   void _resetPassword() {
     final TextEditingController emailController = TextEditingController();
 
